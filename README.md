@@ -75,3 +75,19 @@ The configuration file and scripts outline certain configuration requirements fo
 * Radarr should look at `$localcache/$media_movie` as its root folder
 
 Note: For proper music handling, the `$otherunion` variable should be set so that your Music folder appears as a folder underneath the unionfs mount `$mediadir` and Plex pointed at it instead of your local Music folder. The scripts explicitly scan new media found there and nowhere else. Feel free to modify the `scan.media` script to accomodate your configuration if you do not wish to include your music folder in the unionfs mount.
+
+# Plex Media Server Specifics
+When using SmokeScreen, PMS must be configured to no longer scan for media, and disable thumbnail generation and media analysis. If you leave these options enabled, you will likely end up with a 24H ban for hitting Google's API too much. Since rclone provides no caching of data from your cloud service, each request hits the API instead of a local cache like other mount solution.
+
+Specifically, you must disable:
+* Settings -> Library -> Update my library automatically
+* Settings -> Library -> Run a partial scan when changes are detected
+* Settings -> Library -> Include music libraries in automatic updates
+* Settings -> Library -> Update my library periodically
+* Settings -> Scheduled Tasks -> Update all libraries during maintenance
+* Settings -> Scheduled Tasks -> Upgrade media analysis during maintenance
+* Settings -> Scheduled Tasks -> Perform extensive media analysis during maintenance
+
+It is also recommended to disable:
+* Settings -> Library -> Empty trash automatically after every scan
+* Settings -> Library -> Allow media deletion
