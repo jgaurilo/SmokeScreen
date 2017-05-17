@@ -9,20 +9,12 @@ This project relies on:
 * Sonarr, Radarr, SABnzbd, Torrent Clients (optional)
 
 # Installation
-clone the repo locally, and then
+clone the repo then
 * move smokescreen.conf to ~/.config/SmokeScreen/smokescreen.conf
 * move the scripts to ~/bin/
-* Edit smokescreen.conf to your environment
   
 # Configuration
-The smokescreen.conf is well documented with how things must be configured. The `sonarr.cache` and `radarr.cache` files outline the configuration requirements in those pieces of software.
-
-# Preparation
-There are a number of things required:
-* A local folder where media will be saved
-* A local folder where the cache will be built (Optional - for use with Sonarr/Radarr)
-* A local mount point for Google Drive
-* A local mount point for the union of Google Drive and Local Media folders
+The configuration file `smokescreen.conf` is well documented with how things must be configured. The `sonarr.cache` and `radarr.cache` files outline the configuration requirements for Sonarr/Radarr if you wish to use them.
 
 # Required Local Folders
 Note: these match the default configuration supplied
@@ -49,7 +41,7 @@ If `$encryptgsuite` is set to 1 a fourth remote is required:
 If `$encryptamazon` is set to anything other than 1, `ACDCRYPT:` is not required.
 
 # Cloud Storage Setup
-There is a checking script included that looks for a specific file on cloud storage. Set in the configuration as `$checkfilename`, when Google is mounted you should see this file at `$mediadir/$checkfilename`. In the default configuration this file will be located at `~/media/google-check`. Use rclone to upload a file of this name to your Google drive's `$cloudsubdir`. `Media` is the default top level subfolder.
+There is a checking script included that looks for a specific file on cloud storage. Set in the configuration as `$checkfilename`, when Google is mounted you should see this file at `$mediadir/$checkfilename`. In the default configuration this file will be located at `~/media/google-check`. Use rclone to upload a file of this name to your Google drive's `$cloudsubdir`. `Media` is the default top level subfolder on cloud storage in the configuration.
 
 If using encryption for Google:
 
@@ -61,7 +53,7 @@ If not using encryption for Google:
     touch ~/google-check
     rclone copy ~/google-check GSUITE:Media
 
-# CRON Jobs To Get It All Working
+# CRON
 Add the following to your user's crontab:
 
     # Every five minutes, attempt to upload new media to the cloud
