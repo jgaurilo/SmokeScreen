@@ -36,7 +36,7 @@ Note: these match the default configuration supplied
 
     rclone config
     
-You should create only the remotes you require. The "default" installation is unencrypted data on Google and encrypted data on ACD, so three remotes are required:
+You should create only the remotes you require. The "default" configuration is unencrypted data on Google and encrypted data on ACD, so three remotes are required:
 
 * ACD: remote pointing at the top level of your Amazon Cloud Drive
 * ACDCRYPT: rclone-crypt remote pointing at ACD:
@@ -46,7 +46,7 @@ If $encryptgsuite is set to 1 a fourth remote is required:
 
 * GSUITECRYPT: rclone-crypt remote pointing at GSUITE:
 
-If $encryptamazon is set to anything other than 1, `ACDCRYPT:` is not required.
+If `$encryptamazon` is set to anything other than 1, `ACDCRYPT:` is not required.
 
 # Cloud Storage Setup
 There is a checking script included that looks for a specific file on cloud storage. Set in the configuration as `$checkfilename`, when Google is mounted you should see this file at `$mediadir/$checkfilename`. In the default configuration this file will be located at `~/media/google-check`. Use rclone to upload a file of this name to your Google drive's `$cloudsubdir`. `Media` is the default top level subfolder.
@@ -74,6 +74,10 @@ Add the following to your user's crontab:
 # Sonarr/Radarr/Plex Configuration
 The scripts outline certain configuration requirements for the additional software. The short version is:
 
-* Plex should look at `$mediadir`
+* Plex should look at `$mediadir/$media_shows` for TV Series
+* Plex should look at `$mediadir/$media_movie` for Movies
+* Plex should look at `$mediadir/$media_music` for Music (See note)
 * Sonarr should look at `$localcache/$media_shows` as its root folder
 * Radarr should look at `$localcache/$media_movie` as its root folder
+
+Note: For proper music handling, the `$otherunion` variable should be set so that your Music folder appears as a folder underneath the unionfs mount `$mediadir` and Plex pointed at it instead of your local Music folder. The scripts explicitly scan new media found there and nowhere else. Feel free to modify the `scan.media` script to accomodate your configuration if you do not wish to include your music folder in the unionfs mount.
