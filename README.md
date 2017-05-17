@@ -24,9 +24,56 @@ There are a number of things required:
 * A local mount point for Google Drive
 * A local mount point for the union of Google Drive and Local Media folders
 
-Let's get started:
+# Required Local Folders
+Note: these match the default configuration supplied
 
     mkdir ~/.localmedia
     mkdir ~/.localmedia-cache
     mkdir ~/.google
     mkdir ~/media
+
+# Required rclone Remotes
+
+    rclone config
+    
+You should create only the remotes you require. The "default" installation is unencrypted data on Google and encrypted data on ACD, so three remotes are required:
+
+* ACD: remote pointing at the top level of your Amazon Cloud Drive
+* ACDCRYPT: rclone-crypt remote pointing at ACD:
+* GSUITE: remote pointing at the top level of your Google Drive
+
+If $encryptgsuite is set to 1 a fourth remote is required:
+
+* GSUITECRYPT: rclone-crypt remote pointing at GSUITE:
+
+If $encryptamazon is set to anything other than 1, `ACDCRYPT:` is not required.
+
+# Cloud Storage Setup
+There is a checking script included that looks for a specific file on cloud storage. Set in the configuration as `$checkfilename`, when Google is mounted you should see this file at `$mediadir/$checkfilename`. In the default configuration this file will be located at `~/media/google-check`. Use rclone to upload a file of this name to your Google drive's `$cloudsubdir`. `Media` is the default top level subfolder.
+
+If using encryption for Google:
+
+    touch ~/google-check
+    rclone copy ~/google-check GSUITECRYPT:Media
+    
+If not using encryption for Google:
+
+    touch ~/google-check
+    rclone copy ~/google-check GSUITE:Media
+
+# CRON Jobs To Get It All Working
+Add the following to your user's crontab:
+
+    # Every five minutes, attempt to upload new media to the cloud
+    */5 * * * * /home/USER/bin/update.cloud >> /home/USER/logs/update.cloud.log 2>&1
+    # Every day at 1am kick off a Plex media scan and backup newly downloaded music to the cloud
+    0   1 * * * /home/USER/bin/scan.media >> /home/USER/logs/scan.media.log 2>&1 
+    # Every two minutes, check to make sure Google is still mounted
+    */2 * * * * /home/USER/bin/check.mount >> /home/USER/logs/check.mount.log 2>&1
+    
+# Sonarr/Radarr/Plex Configuration
+The scripts outline certain configuration requirements for the additional software. The short version is:
+
+* Plex should look at `$mediadir`
+* Sonarr should look at `$localcache/$media_shows` as its root folder
+* Radarr should look at `$localcache/$media_movie` as its root folder
