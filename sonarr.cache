@@ -1,0 +1,91 @@
+#! /bin/bash
+# This is a custom Sonarr script that uses a local cache
+# Assumptions:
+#   1.) Sonarr is configured to point at a "cache" directory, not actual media
+#   2.) You have a local media folder on the same drive that gets
+#       uploaded to cloud storage on a schedule
+#   3.) You have Sonarr configured to NOT analyze media (it won't work)
+# This script kicks in on "Download" and "Upgrade"
+# It moves newly downloaded media to the specified local media folder
+# then creates a zero byte cache file in it's place that Sonarr can scan
+#
+# For Sonarr Upgrades, it deletes the old files from local and cloud storage
+# Since Sonarr will only delete the local cache file, not the actual media
+#
+# It was developed to prevent API bans when hosting your media on Google Drive
+###############################################################################
+. "${HOME}/.config/SmokeScreen/smokescreen.conf"
+
+logfile="${HOME}/logs/$(basename $0).log"
+exec >> $logfile 2>&1
+
+# Let's roll
+echo "$(date "+%d.%m.%Y %T") INFO: Starting Sonarr Import"
+echo "$(date "+%d.%m.%Y %T") INFO: Importing ${sonarr_episodefile_path}"
+
+# Internal Field Separator 
+OLDIFS=$IFS
+IFS='|'
+
+# Season Number
+echo  "$(date "+%d.%m.%Y %T") INFO: Building Season Number"
+if [ ${sonarr_episodefile_seasonnumber} == 0 ]; then
+    season="Specials"
+else
+    if [ "${zeropad}" = "1" ]; then
+        season="Season `printf %02d ${sonarr_episodefile_seasonnumber}`"
+    else
+        season="Season ${sonarr_episodefile_seasonnumber}"
+    fi
+fi
+
+# Actual series folder name (because it doesn't match ${sonarr_series_title})
+# And there isn't a variable with just the series folder in it
+# This has a leading / so don't add one if appending it to another path
+seriesreplace="${localcache}/${media_shows}"
+seriesfolder="${sonarr_series_path#${seriesreplace}}"
+
+# The full path to the root of the series folder where real media will exist
+mediapath="${localdir}/${media_shows}${seriesfolder}"
+
+# Path on cloud storage
+cloudpath="${cloudsubdir}/${media_shows}${seriesfolder}"
+
+# Path to where Plex sees the media
+plexpath="${plex_shows_folder}${seriesfolder}/${season}"
+
+# If this is an upgrade, delete the media file (Sonarr will take care of the cache file itself)
+if [ $sonarr_isupgrade == True ]; then
+   echo "$(date "+%d.%m.%Y %T") INFO: Import is an upgrade"
+
+    for deletedfile in "${sonarr_deletedrelativepaths}"; do
+        localremove="${mediapath}/${deletedfile}"
+        cloudremove="${cloudpath}/${deletedfile}"
+        echo "$(date "+%d.%m.%Y %T") INFO: Removing ${localremove}"
+        rm "${localremove}"
+        echo "$(date "+%d.%m.%Y %T") INFO: Removing ${cloudremove}"
+        ${rclonebin} -v delete "${gsuiteremote}:${cloudremove}"
+    done
+fi
+
+#create new paths for new series both series and season.
+echo  "$(date "+%d.%m.%Y %T") INFO: Creating Season Folder"
+mkdir -p "${mediapath}/${season}"
+
+#Move the imported media file to actual storage and leave a cache file in its place
+echo "$(date "+%d.%m.%Y %T") INFO: Moving media to local media folder"
+mv "${sonarr_episodefile_path}" "${mediapath}/${sonarr_episodefile_relativepath}"
+echo "$(date "+%d.%m.%Y %T") INFO: Creating local cache file"
+touch "${sonarr_episodefile_path}"
+
+echo  "$(date "+%d.%m.%Y %T") INFO: Finished importing episodes"
+
+#Plex scan
+echo "$(date "+%d.%m.%Y %T") INFO: Scanning ${plexpath} in to Plex"
+${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_shows_category} -d "${plexpath}"
+
+#Set IFS back to what it was
+IFS=$OLDIFS
+
+exit 0
+

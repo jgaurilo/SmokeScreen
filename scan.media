@@ -1,0 +1,101 @@
+#!/bin/sh
+# This will scan anything that's shown up since the last run of the scan
+# It was added so that if something was missed during Sonarr/Radarr import
+# it will get picked up.
+#
+# It also handles backing up music to cloud storage and scanning it in to plex
+#
+# Once scanning is complete, it rebuilds the Movie/Show cache for Sonnar/Radarr
+#
+###############################################################################
+. ${HOME}/.config/SmokeScreen/smokescreen.conf
+cache_dir="${HOME}/.cache/pmscan"
+
+lock="/tmp/$(basename $0)"
+if [ ! -f ${lock} ]; then
+	echo "$$" > ${lock}
+
+	echo "$(date "+%d.%m.%Y %T") INFO: Plex Scan Started..."
+	if [ ! -f "${cache_dir}/lastfullrun" ]; then
+	        find_options=""
+		mkdir -p ${cache_dir}
+	else
+	       	find_options="-cnewer ${cache_dir}/lastfullrun"
+	fi
+
+	# scan movies in to Plex
+        find ${plex_movie_folder} -type f ${find_options} |
+        while read n; do
+                ${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_movie_category} -d "$(dirname "$n")"
+        done
+
+	# scan TV in to Plex
+        find ${plex_shows_folder} -type f ${find_options} |
+        while read n; do
+                ${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_shows_category} -d "$(dirname "$n")"
+        done
+
+	# scan music and upload new to cloud
+	find ${local_music_folder} -type f ${find_options} |
+        while read n; do
+                destfolder="$(dirname "$n")"
+                destfolder="${destfolder#${local_music_folder}}"
+		plexfolder="${plex_music_folder}${destfolder}"
+
+                ${rclonebin} copy ${rclonecopyoptions} "$n" "${gsuiteremote}:${cloudsubdir}/${media_music}${destfolder}" 2>&1
+                ${rclonebin} copy ${rclonecopyoptions} "$n" "${amazonremote}:${cloudsubdir}/${media_music}${destfolder}" 2>&1
+                ${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_music_category} -d "${plexfolder}"
+        done
+
+	touch "${cache_dir}/lastfullrun"
+
+	echo "$(date "+%d.%m.%Y %T") INFO: Plex Scan Complete"
+	echo ""
+
+	echo "$(date "+%d.%m.%Y %T") INFO: Starting Cache Sync..."
+        echo "$(date "+%d.%m.%Y %T") INFO: Deleting cache files for non-existent media files"
+        find "${localcache}" -type f |
+        while read n; do
+                # Figure out the path to the actual media file
+                mediafile="${mediadir}${n#${localcache}}"
+                if [ ! -f "${mediafile}" ]; then
+                        echo "$(date "+%d.%m.%Y %T") INFO: No media file exists for ${n}, removing from cache"
+                        rm "${n}"
+                fi
+        done
+
+        echo "$(date "+%d.%m.%Y %T") INFO: Creating missing cache files for Movies"
+        find "${plex_movie_folder}" -type f -size +25M |
+        while read n; do
+                # Figure out the path to the cache version of this file
+                cachefile="${localcache}${n#${mediadir}}"
+                cachedir="$(dirname -- "${cachefile}")"
+                if [ ! -f "${cachefile}" ]; then
+                        echo "$(date "+%d.%m.%Y %T") INFO: Creating cache file"
+                        mkdir -p "${cachedir}"
+                        touch "${cachefile}"
+                fi
+        done
+
+	echo "$(date "+%d.%m.%Y %T") INFO: Creating missing cache files for TV shows"
+        find "${plex_shows_folder}" -type f -size +25M |
+        while read n; do
+                # Figure out the path to the cache version of this file
+                cachefile="${localcache}${n#${mediadir}}"
+                cachedir="$(dirname -- "${cachefile}")"
+                if [ ! -f "${cachefile}" ]; then
+                        echo "$(date "+%d.%m.%Y %T") INFO: Creating cache file"
+                        mkdir -p "${cachedir}"
+                        touch "${cachefile}"
+                fi
+        done
+
+        echo "$(date "+%d.%m.%Y %T") INFO: Completed Cache Sync..."
+
+	rm ${lock}
+	exit 0
+else
+        # error!
+        echo "$(date "+%d.%m.%Y %T") INFO: Plex scan already running on PID $(cat ${lock})."
+        exit 3
+fi

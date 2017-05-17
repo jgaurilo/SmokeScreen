@@ -1,0 +1,23 @@
+#!/bin/sh
+###############################################################################
+. ${HOME}/.config/SmokeScreen/smokescreen.conf
+
+# Unmount drives
+/bin/bash ${bindir}/unmount.remote 2>&1
+sleep 30
+
+# Mount drives
+echo "$(date "+%d.%m.%Y %T") INFO: Mounting filesystems"
+
+#GSuite unencrypted data
+echo "$(date "+%d.%m.%Y %T") INFO: Mounting ${googledir}"
+$rclonebin mount ${rclonemountopts} ${gsuiteremote}: ${googledir} &
+sleep 5
+
+#Union of Google/Local
+echo "$(date "+%d.%m.%Y %T") INFO: Mounting ${mediadir}"
+$ufsbin -o ${unionmountopts} ${localdir}=RW:${googledir}/${cloudsubdir}=RO${otherunion} $mediadir
+
+echo "$(date "+%d.%m.%Y %T") INFO: File systems mounted"
+
+exit

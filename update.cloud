@@ -1,0 +1,61 @@
+#!/bin/sh
+###############################################################################
+. ${HOME}/.config/SmokeScreen/smokescreen.conf
+
+lock="/tmp/$(basename $0)"
+
+if [ ! -f ${lock} ]; then
+	echo "$$" > ${lock}
+	echo  "$(date "+%d.%m.%Y %T") INFO: Starting Upload..."
+
+	find "$localdir" -type f |
+	while read n; do
+		destpath="$(dirname "$n" | sed -e s@$localdir@@)"
+		decryptname="$(echo "$n" | sed -e s@$localdir@@)"
+
+		# Skip processing files named like the below
+		case "$decryptname" in
+			(*.partial~) continue ;;
+			(*_HIDDEN~) continue ;;
+		esac
+
+		echo "$(date "+%d.%m.%Y %T") INFO: Processing file: ${decryptname}"
+
+		# If file is opened by another process, wait until it isn't.
+		while [ $(lsof "$n" >/dev/null 2>&1) ] || \
+			[ $(lsof "${mediadir}/${decryptname}" >/dev/null 2>&1) ]; do
+			echo "File in use. Retrying in 10 seconds."
+			sleep 10
+		done
+
+		# Copy/move file to gsuite unencrypted
+		if [ "${useamazon}" = "1" ]; then
+			action=copy
+		else
+			action=move
+		fi
+
+		echo "$(date "+%d.%m.%Y %T") INFO: ${action} to Google Drive"
+		${rclonebin} ${action} ${rcloneuploadoptions} "$n" "${gsuiteremote}:${cloudsubdir}${destpath}" 2>&1
+
+		if [ "${useamazon}" = "1" ]; then
+			# Move file to ACD rclone crypt-encrypted cold storage backup
+			echo "$(date "+%d.%m.%Y %T") INFO: move to ACD cold storage"
+			${rclonebin} move ${rcloneuploadoptions} "$n" "${amazonremote}:${cloudsubdir}${destpath}" 2>&1
+		fi
+	done
+
+	# Nuke empty folders in local media folder
+	echo "$(date "+%d.%m.%Y %T") INFO: Nuking Empty Folders..."
+	find ${localdir} -mindepth 2 -type d -empty -delete 2>&1
+
+	# remove lock.
+	rm ${lock}
+
+	exit 0
+else
+	# error!
+	echo  "$(date "+%d.%m.%Y %T") INFO: Update already running on PID $(cat ${lock})."
+	exit 3
+fi
+

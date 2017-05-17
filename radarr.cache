@@ -1,0 +1,67 @@
+#! /bin/bash
+# This is a custom Radarr script that uses a local cache
+# Assumptions:
+#   1.) Radarr is configured to point at a "cache" directory, not actual media
+#   2.) You have a local media folder on the same drive that gets
+#       uploaded to cloud storage on a schedule
+#   3.) You have Radarr configured to NOT analyze media (it won't work)
+# This script kicks in on "Download" and "Upgrade"
+# It moves newly downloaded media to the specified local media folder
+# then creates a zero byte cache file in it's place that Radarr can scan
+#
+# It was developed to prevent API bans when hosting your media on Google Drive
+###############################################################################
+. "${HOME}/.config/SmokeScreen/smokescreen.conf"
+
+logfile="${HOME}/logs/$(basename $0).log"
+exec >> $logfile 2>&1
+
+OLDIFS=$IFS
+IFS='|'
+
+echo "$(date "+%d.%m.%Y %T") INFO: Starting Radarr Import"
+echo "$(date "+%d.%m.%Y %T") INFO: Importing ${radarr_movie_path}"
+
+# Paths
+cachepath="${localcache}/${media_movie}"
+mediapath="${localdir}/${media_movie}"
+
+# Subfolder under the cache path and media path where the movie will be
+# This has a leading / so don't add one if appending it to another path
+moviefolder="${radarr_movie_path#${cachepath}}"
+
+# The full path to where the media file will end up
+finalmedia="${mediapath}${moviefolder}/${radarr_moviefile_relativepath}"
+
+# The path on cloud storage to delete in case of upgrade
+cloudpath="${cloudsubdir}/${media_movie}${moviefolder}"
+
+#create new paths for new series both series and season.
+echo  "$(date "+%d.%m.%Y %T") INFO: Creating Movie Folder"
+mkdir -p "${mediapath}${moviefolder}"
+
+#if there are files larger than 50M in the media folder, delete them
+#this is a hack to handle Upgrades
+find ${mediapath}${moviefolder} -type f -size +50M -delete
+
+#And delete the Movie folder on cloud storage if it exists
+${rclonebin} --min-size 50M delete ${gsuiteremote}:${cloudpath}
+
+#Move the imported media file to actual storage and leave a cache file in its place
+echo "$(date "+%d.%m.%Y %T") INFO: Moving media to local media folder"
+mv "${radarr_moviefile_path}" "${finalmedia}"
+echo "$(date "+%d.%m.%Y %T") INFO: Creating local cache file"
+touch "${radarr_moviefile_path}"
+
+#Plex scan
+plexpath="${plex_movie_folder}${moviefolder}"
+echo "$(date "+%d.%m.%Y %T") INFO: Scanning ${plexpath} in to Plex"
+${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_movie_category} -d "${plexpath}"
+
+echo  "$(date "+%d.%m.%Y %T") INFO: Finished importing movie"
+
+#Set IFS back to what it was
+IFS=$OLDIFS
+
+exit 0
+
