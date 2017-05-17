@@ -42,7 +42,7 @@ You should create only the remotes you require. The "default" configuration is u
 * ACDCRYPT: rclone-crypt remote pointing at ACD:
 * GSUITE: remote pointing at the top level of your Google Drive
 
-If $encryptgsuite is set to 1 a fourth remote is required:
+If `$encryptgsuite` is set to 1 a fourth remote is required:
 
 * GSUITECRYPT: rclone-crypt remote pointing at GSUITE:
 
