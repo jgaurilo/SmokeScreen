@@ -70,9 +70,11 @@ Add the following to your user's crontab:
     0   1 * * * /home/USER/bin/scan.media >> /home/USER/logs/scan.media.log 2>&1 
     # Every two minutes, check to make sure Google is still mounted
     */2 * * * * /home/USER/bin/check.mount >> /home/USER/logs/check.mount.log 2>&1
-    
-# Sonarr/Radarr/Plex Configuration
-The scripts outline certain configuration requirements for the additional software. The short version is:
+
+# Media Configuration
+All media that is saved to `$localmedia/` is uploaded to cloud storage and removed locally. All MUSIC stored at `$local_music_folder` is uploaded to cloud storage as a backup only, as Plex does not work well with music on cloud storage. Subfolders under `$localmedia` should match `$media_shows` and `$media_movie` for TV shows and movies.
+
+The configuration file and scripts outline certain configuration requirements for the additional software. The short version is:
 
 * Plex should look at `$mediadir/$media_shows` for TV Series
 * Plex should look at `$mediadir/$media_movie` for Movies
