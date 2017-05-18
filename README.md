@@ -20,14 +20,14 @@ clone the repo then
 The configuration file `smokescreen.conf` is well documented with how things must be configured.
 
 # Required Local Folders
-Note: these match the default configuration supplied
+Note: these match the default configuration supplied, feel free to use your own folders anywhere on your system.
 
     mkdir ~/.localmedia
     mkdir ~/.localmedia-cache
     mkdir ~/.google
     mkdir ~/media
 
-If your local media is somewhere else, you can move it to ~/.localmedia or you can cahnge the configuration to point to where your local media is actually stored.
+If you still have local media on your drive, you can move it to ~/.localmedia or you can cahnge the configuration to point to where your local media is actually stored. If you don't have any media locally, the defaults will work well.
 
 # Required rclone Remotes
 
@@ -63,7 +63,12 @@ Now mount the system by running the `mount.remote` script. You should see your G
 # Sonarr and Radarr Configuration
 The `sonarr.cache` and `radarr.cache` files outline the configuration requirements for Sonarr/Radarr if you wish to use them. On the 'Connect' tab of the settings page, add a custom script that points at `sonarr.cache` in Sonarr on `Download` and `Upgrade` and one in Radarr that points at `radarr.cache` that notifies on `Download` and `Upgrade`. Scanning in to Plex will NOT occur without this.
 
-Now run the `scan.media` script to build the local cache. Once it's complete, continue to reconfigure Sonarr and Radarr to look at ~/.localmedia-cache as their root folder instead of wherever you had them pointed before.
+Now run `scan.media initialize` to build the local cache. Leaving off the `initialize` argument will cause it to also attempt to upload music found in `$local_music_folder`. Once it's complete, continue by reconfiguring Sonarr and Radarr to look at ~/.localmedia-cache as their root folder instead of wherever you had them pointed before. Media that these tools download will follow the path of:
+
+* Download client downloads to temp directory
+* Sonarr/Radarr "import" the file to the .localmedia-cache folder
+* The custom script in Sonarr/Radarr will move the file to the .localmedia folder
+* update.cloud will then upload it to cloud storage and remove it from .localmedia
 
 # CRON
 Add the following to your user's crontab:
