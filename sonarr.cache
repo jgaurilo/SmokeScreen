@@ -29,7 +29,7 @@ IFS='|'
 
 # Season Number
 echo  "$(date "+%d.%m.%Y %T") INFO: Building Season Number"
-if [ ${sonarr_episodefile_seasonnumber} == 0 ]; then
+if [ "${sonarr_episodefile_seasonnumber}" = "0" ]; then
     season="Specials"
 else
     if [ "${zeropad}" = "1" ]; then
@@ -55,7 +55,7 @@ cloudpath="${cloudsubdir}/${media_shows}${seriesfolder}"
 plexpath="${plex_shows_folder}${seriesfolder}/${season}"
 
 # If this is an upgrade, delete the media file (Sonarr will take care of the cache file itself)
-if [ $sonarr_isupgrade == True ]; then
+if [ "${sonarr_isupgrade}" = "True" ]; then
    echo "$(date "+%d.%m.%Y %T") INFO: Import is an upgrade"
 
     for deletedfile in "${sonarr_deletedrelativepaths}"; do
