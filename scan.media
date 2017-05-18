@@ -19,32 +19,22 @@ if [ ! -f ${lock} ]; then
 	       	find_options="-cnewer ${cache_dir}/lastfullrun"
 	fi
 
-	# scan movies in to Plex
-        #find ${plex_movie_folder} -type f ${find_options} |
-        #while read n; do
-        #        ${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_movie_category} -d "$(dirname "$n")"
-        #done
-
-	# scan TV in to Plex
-        #find ${plex_shows_folder} -type f ${find_options} |
-        #while read n; do
-        #        ${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_shows_category} -d "$(dirname "$n")"
-        #done
-
 	# scan music and upload new to cloud
-	find ${local_music_folder} -type f ${find_options} |
-        while read n; do
-                destfolder="$(dirname "$n")"
-                destfolder="${destfolder#${local_music_folder}}"
-		plexfolder="${plex_music_folder}${destfolder}"
+	if [ ! "${1}" = "initialize" ]; then
+		find ${local_music_folder} -type f ${find_options} |
+		while read n; do
+			destfolder="$(dirname "$n")"
+			destfolder="${destfolder#${local_music_folder}}"
+			plexfolder="${plex_music_folder}${destfolder}"
 
-                ${rclonebin} copy ${rclonecopyoptions} "$n" "${gsuiteremote}:${cloudsubdir}/${media_music}${destfolder}" 2>&1
-                ${rclonebin} copy ${rclonecopyoptions} "$n" "${amazonremote}:${cloudsubdir}/${media_music}${destfolder}" 2>&1
-                ${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_music_category} -d "${plexfolder}"
-        done
+			${rclonebin} copy ${rclonecopyoptions} "$n" "${gsuiteremote}:${cloudsubdir}/${media_music}${destfolder}" 2>&1
+			${rclonebin} copy ${rclonecopyoptions} "$n" "${amazonremote}:${cloudsubdir}/${media_music}${destfolder}" 2>&1
+			${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_music_category} -d "${plexfolder}"
+		done
 
-	touch "${cache_dir}/lastfullrun"
-
+		touch "${cache_dir}/lastfullrun"
+	fi
+	
 	echo "$(date "+%d.%m.%Y %T") INFO: Plex Scan Complete"
 	echo ""
 
