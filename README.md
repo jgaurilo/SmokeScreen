@@ -19,9 +19,6 @@ clone the repo then
 # Main Configuration
 The configuration file `smokescreen.conf` is well documented with how things must be configured.
 
-# Sonarr and Radarr Configuration
-The `sonarr.cache` and `radarr.cache` files outline the configuration requirements for Sonarr/Radarr if you wish to use them. On the 'Connect' tab of the settings page, add a custom script that points at `sonarr.cache` in Sonarr on `Download` and `Upgrade` and one in Radarr that points at `radarr.cache` that notifies on `Download` and `Upgrade`. Scanning in to Plex will NOT occur without this.
-
 # Required Local Folders
 Note: these match the default configuration supplied
 
@@ -29,6 +26,8 @@ Note: these match the default configuration supplied
     mkdir ~/.localmedia-cache
     mkdir ~/.google
     mkdir ~/media
+
+If your local media is somewhere else, you can move it to ~/.localmedia or you can cahnge the configuration to point to where your local media is actually stored.
 
 # Required rclone Remotes
 
@@ -58,6 +57,13 @@ If not using encryption for Google:
 
     touch ~/google-check
     rclone copy ~/google-check GSUITE:Media
+
+Now mount the system by running the `mount.remote` script. You should see your Google drive mounted at ~/.google and you should see a union of your local media and Google at ~/media. If you don't, stop here and resolve it before continuing.
+
+# Sonarr and Radarr Configuration
+The `sonarr.cache` and `radarr.cache` files outline the configuration requirements for Sonarr/Radarr if you wish to use them. On the 'Connect' tab of the settings page, add a custom script that points at `sonarr.cache` in Sonarr on `Download` and `Upgrade` and one in Radarr that points at `radarr.cache` that notifies on `Download` and `Upgrade`. Scanning in to Plex will NOT occur without this.
+
+Now run the `scan.media` script to build the local cache. Once it's complete, continue to reconfigure Sonarr and Radarr to look at ~/.localmedia-cache as their root folder instead of wherever you had them pointed before.
 
 # CRON
 Add the following to your user's crontab:
