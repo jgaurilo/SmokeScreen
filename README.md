@@ -13,8 +13,11 @@ clone the repo then
 * move smokescreen.conf to ~/.config/SmokeScreen/smokescreen.conf
 * move the scripts to ~/bin/
   
-# Configuration
-The configuration file `smokescreen.conf` is well documented with how things must be configured. The `sonarr.cache` and `radarr.cache` files outline the configuration requirements for Sonarr/Radarr if you wish to use them.
+# Main Configuration
+The configuration file `smokescreen.conf` is well documented with how things must be configured.
+
+# Sonarr and Radarr Configuration
+The `sonarr.cache` and `radarr.cache` files outline the configuration requirements for Sonarr/Radarr if you wish to use them. On the 'Connect' tab of the settings page, add a custom script that points at `sonarr.cache` in Sonarr on `Download` and `Upgrade` and one in Radarr that points at `radarr.cache` that notifies on `Download` and `Upgrade`. Scanning in to Plex will NOT occur without this.
 
 # Required Local Folders
 Note: these match the default configuration supplied
