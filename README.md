@@ -1,3 +1,6 @@
+## NOTICE ##
+As of 18-MAY-2017, rclone is currently producing rate exceeded errors connecting to ACD.
+
 # SmokeScreen
 Host your Plex media with (or without) rclone-crypt on Google Drive with cold storage on ACD, and a local "fake" cache for Sonarr and Radarr to scan to prevent Google Drive API limit bans. Special thanks to Reddit users /u/gesis and /u/ryanm91 for most of the heavy lifting.
 
