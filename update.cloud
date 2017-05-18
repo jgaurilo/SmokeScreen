@@ -29,8 +29,8 @@ if [ ! -f ${lock} ]; then
 		done
 
 		# Scan to plex if Sonarr/Radarr aren't enabled
-		plexfolder="${mediadir}/${decryptname}"
-		plexfolder="$(dirname "${plexfolder}")"
+		plexpath="${mediadir}/${decryptname}"
+		plexpath="$(dirname "${plexfolder}")"
 		case "${decryptname}" in
 			(/${media_shows}/*)
 				# It is a TV show
