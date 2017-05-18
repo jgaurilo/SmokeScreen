@@ -28,7 +28,9 @@ if [ ! -f ${lock} ]; then
 			plexfolder="${plex_music_folder}${destfolder}"
 
 			${rclonebin} copy ${rclonecopyoptions} "$n" "${gsuiteremote}:${cloudsubdir}/${media_music}${destfolder}" 2>&1
-			${rclonebin} copy ${rclonecopyoptions} "$n" "${amazonremote}:${cloudsubdir}/${media_music}${destfolder}" 2>&1
+			if [ "${useamazon}" = "1" ]; then
+		        	${rclonebin} copy ${rclonecopyoptions} "$n" "${amazonremote}:${cloudsubdir}/${media_music}${destfolder}" 2>&1
+			fi
 			${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_music_category} -d "${plexfolder}"
 		done
 
