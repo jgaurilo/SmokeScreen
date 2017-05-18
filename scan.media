@@ -61,7 +61,7 @@ if [ ! -f ${lock} ]; then
 		        fi
 		done
 
-		if [ "${radarrenabled}" = "1"]; then
+		if [ "${radarrenabled}" = "1" ]; then
 			echo "$(date "+%d.%m.%Y %T") INFO: Creating missing cache files for Movies"
 			find "${plex_movie_folder}" -type f -size +25M |
 			while read n; do
