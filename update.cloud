@@ -49,19 +49,19 @@ if [ ! -f ${lock} ]; then
 		esac
 
 		# Copy/move file to gsuite unencrypted
-		if [ "${useamazon}" = "1" ]; then
+		if [ "${usesecondary}" = "1" ]; then
 			action=copy
 		else
 			action=move
 		fi
 
 		echo "$(date "+%d.%m.%Y %T") INFO: ${action} to Google Drive"
-		${rclonebin} ${action} ${rcloneuploadoptions} "$n" "${gsuiteremote}:${cloudsubdir}${destpath}" 2>&1
+		${rclonebin} ${action} ${rcloneuploadoptions} "$n" "${primaryremote}:${cloudsubdir}${destpath}" 2>&1
 
-		if [ "${useamazon}" = "1" ]; then
+		if [ "${usesecondary}" = "1" ]; then
 			# Move file to ACD rclone crypt-encrypted cold storage backup
 			echo "$(date "+%d.%m.%Y %T") INFO: move to ACD cold storage"
-			${rclonebin} move ${rcloneuploadoptions} "$n" "${amazonremote}:${cloudsubdir}${destpath}" 2>&1
+			${rclonebin} move ${rcloneuploadoptions} "$n" "${secondaryremote}:${cloudsubdir}${destpath}" 2>&1
 		fi
 
 
@@ -80,3 +80,4 @@ else
 	echo  "$(date "+%d.%m.%Y %T") INFO: Update already running on PID $(cat ${lock})."
 	exit 3
 fi
+

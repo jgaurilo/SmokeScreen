@@ -45,7 +45,7 @@ mkdir -p "${mediapath}${moviefolder}"
 find ${mediapath}${moviefolder} -type f -size +50M -delete
 
 #And delete the Movie folder on cloud storage if it exists
-${rclonebin} --min-size 50M delete ${gsuiteremote}:${cloudpath}
+${rclonebin} --min-size 50M delete ${primaryremote}:${cloudpath}
 
 #Move the imported media file to actual storage and leave a cache file in its place
 echo "$(date "+%d.%m.%Y %T") INFO: Moving media to local media folder"

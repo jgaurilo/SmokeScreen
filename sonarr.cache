@@ -64,7 +64,7 @@ if [ "${sonarr_isupgrade}" = "True" ]; then
         echo "$(date "+%d.%m.%Y %T") INFO: Removing ${localremove}"
         rm "${localremove}"
         echo "$(date "+%d.%m.%Y %T") INFO: Removing ${cloudremove}"
-        ${rclonebin} -v delete "${gsuiteremote}:${cloudremove}"
+        ${rclonebin} -v delete "${primaryremote}:${cloudremove}"
     done
 fi
 
