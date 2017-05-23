@@ -55,12 +55,12 @@ if [ ! -f ${lock} ]; then
 			action=move
 		fi
 
-		echo "$(date "+%d.%m.%Y %T") INFO: ${action} to Google Drive"
+		echo "$(date "+%d.%m.%Y %T") INFO: ${action} to primary cloud storage"
 		${rclonebin} ${action} ${rcloneuploadoptions} "$n" "${primaryremote}:${cloudsubdir}${destpath}" 2>&1
 
 		if [ "${usesecondary}" = "1" ]; then
 			# Move file to ACD rclone crypt-encrypted cold storage backup
-			echo "$(date "+%d.%m.%Y %T") INFO: move to ACD cold storage"
+			echo "$(date "+%d.%m.%Y %T") INFO: move to secondary cloud storage"
 			${rclonebin} move ${rcloneuploadoptions} "$n" "${secondaryremote}:${cloudsubdir}${destpath}" 2>&1
 		fi
 
