@@ -9,6 +9,7 @@ This project relies on:
 * rclone
 * unionfs-fuse
 * Plex Media Server
+* Plex running as the same user as the scripts
 * Sonarr, Radarr, SABnzbd, Torrent Clients (optional)
 
 # Installation
