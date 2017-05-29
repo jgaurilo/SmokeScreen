@@ -2,7 +2,7 @@
 As of 18-MAY-2017, rclone is currently banned from connecting to ACD.
 
 # SmokeScreen
-Host your Plex media with (or without) rclone-crypt on cloud storage with a primary and secondary cloud storage provider, and a local "fake" cache for Sonarr and Radarr to scan to prevent Google Drive API limit bans. Special thanks to Reddit users /u/gesis and /u/ryanm91 for most of the heavy lifting.
+Host your Plex media with (or without) rclone-crypt on cloud storage, and a local "fake" cache for Sonarr and Radarr to scan to prevent Google Drive API limit bans. Special thanks to Reddit users /u/gesis and /u/ryanm91 for most of the heavy lifting.
 
 # Pre-requisites
 This project relies on:
@@ -44,10 +44,10 @@ For example:
     touch ~/google-check
     rclone copy ~/google-check GSUITE:Media
 
-Now mount the system by running the `mount.remote` script. You should see your Google drive mounted at ~/.google and you should see a union of your local media and Google at ~/media. If you don't, stop here and resolve it before continuing.
+Now mount the system by running the `mount.remote` script. You should see your Google drive mounted at ~/.google and you should see a union of your local media and Google at ~/content. If you don't, stop here and resolve it before continuing.
 
 # Sonarr and Radarr Configuration
-The `sonarr.cache` and `radarr.cache` files outline the configuration requirements for Sonarr/Radarr if you wish to use them. On the 'Connect' tab of the settings page, add a custom script that points at `sonarr.cache` in Sonarr on `Download` and `Upgrade` and one in Radarr that points at `radarr.cache` that notifies on `Download` and `Upgrade`. Scanning in to Plex will NOT occur without this.
+The `sonarr.cache` and `radarr.cache` files outline the configuration requirements for Sonarr/Radarr if you wish to use them. On the 'Connect' tab of the settings page, add a custom script that points at `sonarr.cache` in Sonarr on `Download` and `Upgrade` and one in Radarr that points at `radarr.cache` that notifies on `Download` and `Upgrade`.
 
 Now run `scan.media` to build the local cache. Once it's complete, continue by reconfiguring Sonarr and Radarr to look at ~/.localmedia-cache as their root folder instead of wherever you had them pointed before. Media that these tools download will follow the path of:
 
