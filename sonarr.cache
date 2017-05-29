@@ -51,9 +51,6 @@ mediapath="${localdir}/${media_shows}${seriesfolder}"
 # Path on cloud storage
 cloudpath="${cloudsubdir}/${media_shows}${seriesfolder}"
 
-# Path to where Plex sees the media
-plexpath="${plex_shows_folder}${seriesfolder}/${season}"
-
 # If this is an upgrade, delete the media file (Sonarr will take care of the cache file itself)
 if [ "${sonarr_isupgrade}" = "True" ]; then
    echo "$(date "+%d.%m.%Y %T") INFO: Import is an upgrade"
@@ -81,6 +78,7 @@ touch "${sonarr_episodefile_path}"
 echo  "$(date "+%d.%m.%Y %T") INFO: Finished importing episodes"
 
 #Plex scan
+plexpath="${plex_shows_folder}${seriesfolder}/${season}"
 echo "$(date "+%d.%m.%Y %T") INFO: Scanning ${plexpath} in to Plex"
 ${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_shows_category} -d "${plexpath}"
 

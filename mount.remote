@@ -10,13 +10,15 @@ sleep 10
 echo "$(date "+%d.%m.%Y %T") INFO: Mounting filesystems"
 
 #GSuite unencrypted data
+mkdir -p "${googledir}"
 echo "$(date "+%d.%m.%Y %T") INFO: Mounting ${googledir}"
-$rclonebin mount ${rclonemountopts} ${primaryremote}: ${googledir} &
+$rclonebin mount ${rclonemountopts} ${primaryremote}: "${googledir}" &
 sleep 5
 
 #Union of Google/Local
+mkdir -p "${mediadir}"
 echo "$(date "+%d.%m.%Y %T") INFO: Mounting ${mediadir}"
-$ufsbin -o ${unionmountopts} ${localdir}=RW:${googledir}/${cloudsubdir}=RO${otherunion} $mediadir
+$ufsbin ${unionmountopts} ${localdir}=RW:${googledir}/${cloudsubdir}=RO "${mediadir}"
 
 echo "$(date "+%d.%m.%Y %T") INFO: File systems mounted"
 
