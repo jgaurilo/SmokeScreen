@@ -20,21 +20,9 @@ clone the repo then
 # Main Configuration
 The configuration file `smokescreen.conf` is well documented with how things must be configured.
 
-# Required Local Folders
-Note: these match the default configuration supplied, feel free to use your own folders anywhere on your system.
-
-    mkdir ~/.localmedia
-    mkdir ~/.localmedia-cache
-    mkdir ~/.google
-    mkdir ~/content
-
-If you still have local media on your drive, you can move it to ~/.localmedia or you can cahnge the configuration to point to where your local media is actually stored. If you don't have any media locally, the defaults will work well.
-
-# Required rclone Remotes
-
-    rclone config
+# Required rclone Remote
     
-Create a remote that points at the top level of your Cloud Storage Provider
+Create a remote in rclone that points at the top level of your Cloud Storage Provider. To use crypt, two remotes are required, with one being a crypt remote pointing at the one configured for your cloud storage. Read the documentation at rclone for further information.
 
 # Cloud Storage Setup
 There is a checking script included that looks for a specific file on cloud storage. Set in the configuration as `$checkfilename`, when Cloud Storage is mounted you should see this file at `$mediadir/$checkfilename`. In the default configuration this file will be located at `~/content/google-check`. Use rclone to upload a file of this name to your Google drive's `$cloudsubdir`. `Media` is the default top level subfolder on cloud storage in the configuration.
@@ -46,17 +34,9 @@ For example:
 
 Now mount the system by running the `mount.remote` script. You should see your Google drive mounted at ~/.google and you should see a union of your local media and Google at ~/content. If you don't, stop here and resolve it before continuing.
 
-# Sonarr and Radarr Configuration
-The `sonarr.cache` and `radarr.cache` files outline the configuration requirements for Sonarr/Radarr if you wish to use them. On the 'Connect' tab of the settings page, add a custom script that points at `sonarr.cache` in Sonarr on `Download` and `Upgrade` and one in Radarr that points at `radarr.cache` that notifies on `Download` and `Upgrade`.
-
-Now run `scan.media` to build the local cache. Once it's complete, continue by reconfiguring Sonarr and Radarr to look at ~/.localmedia-cache as their root folder instead of wherever you had them pointed before. Media that these tools download will follow the path of:
-
-* Download client downloads to temp directory
-* Sonarr/Radarr "import" the file to the .localmedia-cache folder
-* The custom script in Sonarr/Radarr will move the file to the .localmedia folder
-* update.cloud will then upload it to cloud storage and remove it from .localmedia
-
 # CRON
+CRON is used to automatically mount the drives, upload content to cloud storage, scan new media in to Plex and remove local copies of media.
+
 Add the following to your user's crontab:
 
     @hourly /home/USER/bin/update.cloud >> /home/USER/logs/update.cloud.log 2>&1
@@ -90,3 +70,13 @@ Specifically, you must disable:
 It is also recommended to disable:
 * Settings -> Library -> Empty trash automatically after every scan
 * Settings -> Library -> Allow media deletion
+
+# Sonarr and Radarr Configuration
+Set the two variables in the configuration `sonarrenabled` and `radarrenabled` = 1 if you would like to enable the cache. Once saved, run `scan.media` to build the local cache. Once it's complete, continue by reconfiguring Sonarr and Radarr to look at ~/.localmedia-cache as their root folder instead of wherever you had them pointed before and on the 'Connect' tab of the settings pages, add a custom script that points at `sonarr.cache` in Sonarr on `Download` and `Upgrade` and one in Radarr that points at `radarr.cache` that notifies on `Download` and `Upgrade`.
+
+Media that these tools download will follow the path of:
+
+* Download client downloads to temp directory
+* Sonarr/Radarr "import" the file to the .localmedia-cache folder
+* The custom script in Sonarr/Radarr will move the file to the .localmedia folder
+* update.cloud will then upload it to cloud storage and remove it from .localmedia
