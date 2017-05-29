@@ -16,15 +16,15 @@ fi
 cur_exec_date=$(echo "$(date +%s)/60"|bc)
 
 if [ ! -d "$cache_dir" ]; then
-    mkdir -p "$cache_dir"
+	mkdir -p "$cache_dir"
 fi
 
 if [ ! -f "${cache_dir}/lastrun" ]; then
-    find_options=""
-else
-    prev_exec_date="$(cat "${cache_dir}/lastrun")"
-    find_options="-mmin -$(echo "${cur_exec_date}" - "${prev_exec_date}" | bc)"
+	echo "$cur_exec_date" > "${cache_dir}/lastrun"
 fi
+
+prev_exec_date="$(cat "${cache_dir}/lastrun")"
+find_options="-mmin -$(echo "${cur_exec_date}" - "${prev_exec_date}" | bc)"
 
 echo "$cur_exec_date" > "${cache_dir}/lastrun"
 
