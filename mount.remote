@@ -9,14 +9,17 @@ sleep 10
 # Mount drives
 echo "$(date "+%d.%m.%Y %T") INFO: Mounting filesystems"
 
-#GSuite unencrypted data
+# Make sure all folders exist
+echo "$(date "+%d.%m.%Y %T") INFO: Creating mountpoints"
 mkdir -p "${googledir}"
+mkdir -p "${mediadir}"
+
+#GSuite unencrypted data
 echo "$(date "+%d.%m.%Y %T") INFO: Mounting ${googledir}"
 $rclonebin mount ${rclonemountopts} ${primaryremote}: "${googledir}" &
 sleep 5
 
 #Union of Google/Local
-mkdir -p "${mediadir}"
 echo "$(date "+%d.%m.%Y %T") INFO: Mounting ${mediadir}"
 $ufsbin ${unionmountopts} ${localdir}=RW:${googledir}/${cloudsubdir}=RO "${mediadir}"
 
