@@ -16,9 +16,6 @@ This project relies on:
 clone the repo then
 * move smokescreen.conf to ~/.config/SmokeScreen/smokescreen.conf
 * move the scripts to ~/bin/
-  
-# Main Configuration
-The configuration file `smokescreen.conf` is well documented with how things must be configured.
 
 # Required rclone Remote
     
@@ -32,10 +29,10 @@ For example:
     touch ~/google-check
     rclone copy ~/google-check GSUITE:Media
 
-Now mount the system by running the `mount.remote` script. You should see your Google drive mounted at ~/.google and you should see a union of your local media and Google at ~/content. If you don't, stop here and resolve it before continuing.
+Now mount the system by running the `mount.remote` script. You should see your Google drive mounted at ~/.google and you should see a union of your local media and Google media directory at ~/content. If you don't, stop here and resolve it before continuing.
 
 # CRON
-CRON is used to automatically mount the drives, upload content to cloud storage, scan new media in to Plex and remove local copies of media.
+CRON is used to automatically mount the drives, upload content to cloud storage, scan new media in to Plex, keep the cache up to date and remove local copies of media.
 
 Add the following to your user's crontab:
 
@@ -45,15 +42,13 @@ Add the following to your user's crontab:
     */2 * * * * /home/USER/bin/check.mount >> /home/USER/logs/check.mount.log 2>&1
 
 # Media Configuration
-All media that is saved to `$localmedia/` is uploaded to cloud storage and removed locally. Subfolders under `$localmedia` should match `$media_shows` and `$media_movie` for TV shows and movies, otherwise the Sonarr/Radarr caching will fail to work properly.
+All media that is saved to `$localmedia` is uploaded to cloud storage and removed locally.
 
 The configuration file and scripts outline certain configuration requirements for the additional software. The short version is:
 
-* Plex should look at `$plex_shows_folder` for TV Series
-* Plex should look at `$plex_movie_folder` for Movies
-* Plex should look at `$plex_music_folder` for Music (See note)
-* Sonarr series should look at `$localcache/$media_shows` as their root folder
-* Radarr movies should look at `$localcache/$media_movie` as their root folder
+* Plex should look at `$plex_shows_folder` for TV Series,`$plex_movie_folder` for Movies and `$plex_music_folder` for Music
+* Sonarr series root should be `$localcache/$media_shows` if using the cache, or `$plex_shows_folder` if not
+* Radarr movies root should be `$localcache/$media_movie` if using the cache, or `$plex_movie_folder` if not
 
 # Plex Media Server Specifics
 When using SmokeScreen, PMS must be configured to no longer scan for media, and disable media analysis. If you leave these options enabled, you will likely end up with a 24H ban for hitting Google's API too much. Since rclone provides no caching of data from your cloud service, each request hits the API instead of a local cache like other mount solution.
@@ -74,7 +69,7 @@ It is also recommended to disable:
 # Sonarr and Radarr Configuration
 Set the two variables in the configuration `sonarrenabled` and `radarrenabled` = 1 if you would like to enable the cache. Once saved, run `scan.media` to build the local cache. Once it's complete, continue by reconfiguring Sonarr and Radarr to look at ~/.localmedia-cache as their root folder instead of wherever you had them pointed before and on the 'Connect' tab of the settings pages, add a custom script that points at `sonarr.cache` in Sonarr on `Download` and `Upgrade` and one in Radarr that points at `radarr.cache` that notifies on `Download` and `Upgrade`.
 
-Media that these tools download will follow the path of:
+Media that these tools download will follow the following path:
 
 * Download client downloads to temp directory
 * Sonarr/Radarr "import" the file to the .localmedia-cache folder
