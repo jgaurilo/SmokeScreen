@@ -1,8 +1,4 @@
 #!/bin/sh
-# This will handle backing up music to cloud storage and scanning it in to plex
-#
-# Once scanning is complete, it rebuilds the Movie/Show cache for Sonnar/Radarr
-#
 ###############################################################################
 . ${HOME}/.config/SmokeScreen/smokescreen.conf
 cache_dir="${HOME}/.cache/pmscan"
