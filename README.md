@@ -1,8 +1,5 @@
-## NOTICE ##
-As of 18-MAY-2017, rclone is currently banned from connecting to ACD.
-
 # SmokeScreen
-Host your Plex media with (or without) rclone-crypt on cloud storage, and a local "fake" cache for Sonarr and Radarr to scan to prevent Google Drive API limit bans. Special thanks to Reddit users /u/gesis and /u/ryanm91 for most of the heavy lifting.
+Host your Plex media with (or without) rclone-crypt on cloud storage, and a local cache for Sonarr and Radarr to scan to prevent Google Drive API limit bans. Special thanks to Reddit users /u/gesis and /u/ryanm91 for most of the heavy lifting.
 
 # Pre-requisites
 This project relies on:
@@ -42,9 +39,7 @@ Add the following to your user's crontab:
     */2 * * * * /home/USER/bin/check.mount >> /home/USER/logs/check.mount.log 2>&1
 
 # Media Configuration
-All media that is saved to `$localmedia` is uploaded to cloud storage and removed locally.
-
-The configuration file and scripts outline certain configuration requirements for the additional software. The short version is:
+For everything to work as expected, the following criteria must be met:
 
 * Plex should look at `$plex_shows_folder` for TV Series,`$plex_movie_folder` for Movies and `$plex_music_folder` for Music
 * Sonarr series root should be `$localcache/$media_shows` if using the cache, or `$plex_shows_folder` if not
