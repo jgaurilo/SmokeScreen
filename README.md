@@ -16,7 +16,7 @@ clone the repo then
 
 # Required rclone Remote
     
-Create a remote in rclone that points at the top level of your Cloud Storage Provider. To use crypt, two remotes are required, with one being a crypt remote pointing at the one configured for your cloud storage. Read the documentation at rclone for further information. Set the configuration option `primaryremote` to the remote you created in rclone.
+Create a remote in rclone that points at the top level of your Cloud Storage Provider. To use crypt, two remotes are required, with one being a crypt remote pointing at the one configured for your cloud storage. Read the documentation at rclone for further information. Set the configuration option `$primaryremote` to the remote you created in rclone.
 
 # Default Configuration Variables
 
