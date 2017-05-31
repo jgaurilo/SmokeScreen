@@ -62,7 +62,9 @@ It is also recommended to disable:
 * Settings -> Library -> Allow media deletion
 
 # Sonarr and Radarr Configuration
-Set the two variables in the configuration `sonarrenabled` and `radarrenabled` = 1 if you would like to enable the cache. Once saved, run `scan.media` to build the local cache. Once it's complete, continue by reconfiguring Sonarr and Radarr to look at ~/.localmedia-cache as their root folder instead of wherever you had them pointed before and on the 'Connect' tab of the settings pages, add a custom script that points at `sonarr.cache` in Sonarr on `Download` and `Upgrade` and one in Radarr that points at `radarr.cache` that notifies on `Download` and `Upgrade`.
+To use Sonarr/Radarr without the local cache, set the two variables in the configuration `sonarrenabled` and `radarrenabled` = 0. Sonarr and Radarr should then be configured to use `$mediadir` as the root folder for all series/movies. In the default configuration this is `~/content`. Be warned that excessive scanning by Sonarr/Radarr can lead to 24H bans by Google.
+
+To use the local cache, set the two variables in the configuration `sonarrenabled` and `radarrenabled` = 1. Once the configuration is saved with the new settings, run `scan.media` to build the local cache. Once it's complete, continue by reconfiguring Sonarr and Radarr to look at ~/.localmedia-cache as their root folder instead of wherever you had them pointed before and on the 'Connect' tab of the settings pages, add a custom script that points at `sonarr.cache` in Sonarr on `Download` and `Upgrade` and one in Radarr that points at `radarr.cache` that notifies on `Download` and `Upgrade`.
 
 Media that these tools download will follow the following path:
 
