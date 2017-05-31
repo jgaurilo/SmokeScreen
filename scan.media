@@ -100,4 +100,7 @@ if [ "${sonarrenabled}" = "1" ] || [ "${radarrenabled}" = "1" ]; then
 	fi
 
 	echo "$(date "+%d.%m.%Y %T") INFO: Completed Cache Sync..."
+else
+	# cache disabled, delete the cache folder
+	rm -rf "${localcache}"
 fi
