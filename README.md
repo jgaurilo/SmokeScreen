@@ -5,6 +5,7 @@ Host your Plex media with (or without) rclone-crypt on cloud storage, and a loca
 This project relies on:
 * rclone
 * unionfs-fuse
+* bc (sudo apt-get install bc)
 * Plex Media Server
 * Plex running as the same user as the scripts (VERY IMPORTANT)
 * Sonarr, Radarr, SABnzbd, Torrent Clients (optional)
