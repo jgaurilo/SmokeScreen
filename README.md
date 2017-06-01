@@ -53,7 +53,7 @@ It is also recommended to disable:
 * Settings -> Library -> Empty trash automatically after every scan
 * Settings -> Library -> Allow media deletion
 
-If you've created new libraries or modified the paths in existing libraries in Plex, cancel the scans the Plex initiates automatically. We will rescan everything once we're done configuring the other software.
+If you've created new libraries or modified the paths in existing libraries in Plex, cancel the scans that Plex initiates automatically, as they may cause excessive API usage. We will rescan everything once we're done configuring the other software.
 
 # Sonarr and Radarr Configuration
 To use Sonarr/Radarr without the local cache, set the two variables in the configuration `$sonarrenabled` and `$radarrenabled` = 0. Sonarr and Radarr should be configured to use `$mediadir/$media_shows` and `$mediadir/$media_movie` as the root folders for all series/movies. Be warned that excessive scanning by Sonarr/Radarr can lead to 24H bans by Google.
@@ -73,7 +73,7 @@ Media that these tools download will follow the following path with the cache en
 * The custom script in Sonarr/Radarr will move the file to the $localmedia folder and scan the media in to Plex
 * update.cloud will then upload it to cloud storage
 
-If you are NOT using Sonarr or Radarr, set the configuration values for them to 0. Manually add Movies and TV series to `$localmedia/$media_shows` for TV and `$localmedia/$media_movie` for Radarr. Be sure that media placed here manually follows Plex's media naming conventions.
+If you are NOT using Sonarr or Radarr, set the configuration values for them to 0. Manually add Movies and TV series to `$localmedia/$media_shows` for TV and `$localmedia/$media_movie` for movies. Be sure that media manually placed here follows Plex's media naming expectations.
 
 # Initial scan and cache build
 Once all the software is configured correctly, run `scan.media 1` to force a complete scan of all media and build the cache for Sonarr and Radarr if it's enabled. Be prepared to wait, as this will take a while. It might be a good idea to run the scan in a screen so that if your connection is interrupted the scan won't stop: `screen /bin/bash ~/bin/scan.media 1`.
@@ -87,3 +87,6 @@ Add the following to your user's crontab:
     @hourly /home/USER/bin/scan.media >> /home/USER/logs/scan.media.log 2>&1 
     @hourly /home/USER/bin/nuke.local >> /home/USER/logs/nuke.local.log 2>&1
     */2 * * * * /home/USER/bin/check.mount >> /home/USER/logs/check.mount.log 2>&1
+
+# A Note About Music
+Since cloud storage-hosted music doesn't work well with Plex, but we've disabled all automatic scanning, newly added music will no longer appear automatically in Plex. The configuration variable `$plex_music_folder` is available so that `scan.media` will scan newly added music. Leave this variable blank if you do not use Plex for music.
