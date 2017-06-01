@@ -48,10 +48,12 @@ if [ $force = 1 ] || [ ! $sonarrenabled = 1 ]; then
 fi
 
 # scan music in to Plex
-find ${plex_music_folder} -mindepth 1 -type d ${find_options} |
-while read -r d; do
-        ${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_music_category} -d "${d}"
-done
+if [ ! "${plex_music_folder}" = "" ]; then
+	find ${plex_music_folder} -mindepth 1 -type d ${find_options} |
+	while read -r d; do
+		${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_music_category} -d "${d}"
+	done
+fi
 
 echo "$(date "+%d.%m.%Y %T") INFO: Plex Scan Complete"
 echo ""
