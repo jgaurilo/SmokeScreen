@@ -14,6 +14,7 @@ This project relies on:
 clone the repo then
 * move smokescreen.conf to ~/.config/SmokeScreen/smokescreen.conf
 * move the scripts to ~/bin/
+* make sure all the scripts are executable
 
 # Required rclone Remote
     
