@@ -84,8 +84,11 @@ CRON is used to automatically mount the drives, upload content to cloud storage,
 Add the following to your user's crontab:
 
     @hourly /home/USER/bin/update.cloud >> /home/USER/logs/update.cloud.log 2>&1
-    0 1 * * * /home/USER/bin/scan.media >> /home/USER/logs/scan.media.log 2>&1 
+    
+    0 1 * * * /home/USER/bin/scan.media >> /home/USER/logs/scan.media.log 2>&1
+    
     @hourly /home/USER/bin/nuke.local >> /home/USER/logs/nuke.local.log 2>&1
+    
     */2 * * * * /home/USER/bin/check.mount >> /home/USER/logs/check.mount.log 2>&1
  
 # A Note About Music
