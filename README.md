@@ -18,7 +18,13 @@ clone the repo then
 
 # Required rclone Remote
     
-Create a remote in rclone that points at the top level of your Cloud Storage Provider. To use crypt, two remotes are required, with one being a crypt remote pointing at the one configured for your cloud storage. Read the documentation at rclone for further information. Set the configuration option `$primaryremote` to the remote you created in rclone.
+## Without encryption: ##
+Create a remote in rclone that points at the TOP LEVEL of your cloud storage provider. Set the configuration option `$primaryremote` to the remote you created in rclone, and set the configuration option `$cloudsubdir` to a descriptive name. This folder will be created at the top level of your cloud storage automatically when `update.cloud` is run the first time, and media will appear in subfolders beneath it.
+
+## With encryption ##
+Create a remote following the `without encryption` instructions first. Then create a second remote that is a `crypt` remote who's `remote` is the name of your unencrypted remote, followed by `:encrypted`. Follow the instructions to complete setting up the encrypted remote (entering passwords, etc). It is recommended to choose to encrypt filenames. Set the configuration option `$primaryremote` to the encrypted remote you created in rclone, and set the the configuration option `$cloudsubdir` to a descriptive name.
+
+The first time `update.cloud` is run, a folder named `encrypted` will be created at the top level of your cloud storage, and a sub-folder with the encrypted value of `$cloudsubdir` will be created and media will appear in subfolders beneath it.
 
 # Default Configuration Variables
 
