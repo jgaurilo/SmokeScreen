@@ -42,11 +42,11 @@ Now mount the system by running the `check.mount` script. You should see your Go
 When using SmokeScreen, PMS must be configured to no longer scan for media, and disable media analysis. If you leave these options enabled, you will likely end up with a 24H ban for hitting Google's API too much. Since rclone provides no caching of data from your cloud service, each request hits the API.
 
 Media libraries in Plex must be configured:
-* Plex should look at `$plex_shows_folder`
-* Plex should look at `$plex_movie_folder`
-* Plex should look at `$plex_music_folder`
+* Plex should look at `$plex_shows_folder` for TV Series
+* Plex should look at `$plex_movie_folder` for Movies
+* Plex should look at `$plex_music_folder` for Music
 
-Specifically, you must disable:
+You must disable:
 * Settings -> Library -> Update my library automatically
 * Settings -> Library -> Run a partial scan when changes are detected
 * Settings -> Library -> Include music libraries in automatic updates
