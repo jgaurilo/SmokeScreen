@@ -15,17 +15,17 @@ mkdir -p "${googledir}"
 mkdir -p "${mediadir}"
 
 #GSuite unencrypted data
-echo "$(date "+%d.%m.%Y %T") INFO: Mounting ${googledir}"
-$rclonebin mount ${rclonemountopts} ${primaryremote}: "${googledir}" &
+echo "$(date "+%d.%m.%Y %T") INFO: Mounting ${clouddir}"
+$rclonebin mount ${rclonemountopts} ${primaryremote}: "${clouddir}" &
 if [ ! "${cloudsubdir}" = "" ]; then
-	while [ ! -d "${googledir}/${cloudsubdir}" ]; do
+	while [ ! -d "${clouddir}/${cloudsubdir}" ]; do
 		sleep 10
 	done
 fi
 
 #Union of Google/Local
 echo "$(date "+%d.%m.%Y %T") INFO: Mounting ${mediadir}"
-$ufsbin ${unionmountopts} ${localdir}=RW:${googledir}/${cloudsubdir}=RO "${mediadir}"
+$ufsbin ${unionmountopts} ${localdir}=RW:${clouddir}/${cloudsubdir}=RO "${mediadir}"
 
 echo "$(date "+%d.%m.%Y %T") INFO: File systems mounted"
 
