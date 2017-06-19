@@ -31,12 +31,12 @@ The first time `update.cloud` is run, a folder named `encrypted` will be created
 The default configuration creates folders and mount points in your user's home directory. This may not be acceptable for your configuration, so change them to a more suitable location. All steps in this README refer to the `$variable` name and not the `~/path` to avoid confusion.
 
 # Cloud Storage Setup
-There is a checking script included that looks for a specific file on cloud storage. Set in the configuration as `$checkfilename`, when Cloud Storage is mounted you should see this file at `$mediadir/$checkfilename`. Use rclone to upload a file of this name to your Google drive's `$cloudsubdir`:
+There is a checking script included that looks for a specific file on cloud storage. Set in the configuration as `$checkfilename`, when Cloud Storage is mounted you should see this file at `$mediadir/$checkfilename`. Use rclone to upload a file of this name to your cloud storage `$cloudsubdir` folder. Example:
 
     touch ~/google-check
     rclone move ~/google-check GSUITE:Media
 
-Now mount the system by running the `check.mount` script. You should see your Google drive mounted at `$googledir` and you should see a union of your local media and Google media directory at `$mediadir`. If you don't, stop here and resolve it before continuing.
+Now mount the system by running the `check.mount` script. You should see your cloud storage mounted at `$clouddir` and you should see a union of your local media and cloud storage media directory at `$mediadir`. If you don't, stop here and resolve it before continuing.
 
 # Plex Media Server Configuration
 When using SmokeScreen, PMS must be configured to no longer scan for media, and disable media analysis. If you leave these options enabled, you will likely end up with a 24H ban for hitting Google's API too much. Since rclone provides no caching of data from your cloud service, each request hits the API.
