@@ -9,9 +9,9 @@ if mountpoint -q $mediadir; then
         fusermount -uz $mediadir 2>&1
 fi
 
-if mountpoint -q $googledir; then
-	echo "$(date "+%d.%m.%Y %T") INFO: Unmounting ${googledir}"
-	fusermount -uz $googledir 2>&1
+if mountpoint -q $clouddir; then
+	echo "$(date "+%d.%m.%Y %T") INFO: Unmounting ${clouddir}"
+	fusermount -uz $clouddir 2>&1
 fi
 
 echo "$(date "+%d.%m.%Y %T") INFO: File Systems Unmounted!"
