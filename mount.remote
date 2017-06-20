@@ -14,7 +14,7 @@ echo "$(date "+%d.%m.%Y %T") INFO: Creating mountpoints"
 mkdir -p "${googledir}"
 mkdir -p "${mediadir}"
 
-#GSuite unencrypted data
+#Cloud unencrypted data
 echo "$(date "+%d.%m.%Y %T") INFO: Mounting ${clouddir}"
 $rclonebin mount ${rclonemountopts} ${primaryremote}: "${clouddir}" &
 if [ ! "${cloudsubdir}" = "" ]; then
@@ -23,7 +23,7 @@ if [ ! "${cloudsubdir}" = "" ]; then
 	done
 fi
 
-#Union of Google/Local
+#Union of Cloud/Local
 echo "$(date "+%d.%m.%Y %T") INFO: Mounting ${mediadir}"
 $ufsbin ${unionmountopts} ${localdir}=RW:${clouddir}/${cloudsubdir}=RO "${mediadir}"
 
