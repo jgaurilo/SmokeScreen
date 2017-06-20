@@ -95,4 +95,15 @@ Add the following to your user's crontab:
     */2 * * * * /home/USER/bin/check.mount >> /home/USER/logs/check.mount.log 2>&1
 
 # A Note About Music
-Since cloud storage-hosted music doesn't work well with Plex, but we've disabled all automatic scanning, newly added music will no longer appear automatically in Plex. The configuration variable `$plex_music_folder` is available so that `scan.media` will scan newly added music. Leave this variable blank if you do not use Plex for music.
+Since cloud storage-hosted music doesn't work well with Plex, but we've disabled all automatic scanning, newly added music will no longer appear automatically in Plex. The configuration variables `$plex_music_folder` and `$plex_music_category` are available so that `scan.media` will scan newly added music. Leave these variables blank if you do not use Plex for music.
+
+# Utility Script
+There is a script included called pms. This script just sets up the environment so that you can call the Plex media scanner easily. Usage is:
+
+    ./pms "whatever you want to send to the media scanner"
+    
+Make SURE to wrap the command line with quotation marks, so that the entire thing is treated as argument one being passed in. You can use it to get your library IDs by calling it like this:
+
+    ./pms "--list"
+    
+The SmokeScreen.conf file must be in place (and properly configured for your environment) before it will work.
