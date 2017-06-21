@@ -36,16 +36,16 @@ finalmedia="${mediapath}${moviefolder}/${radarr_moviefile_relativepath}"
 # The path on cloud storage to delete in case of upgrade
 cloudpath="${cloudsubdir}/${media_movie}${moviefolder}"
 
+#Delete local movie folder
+#this is a hack to handle Upgrades
+rm -rf ${mediapath}${moviefolder}
+
+#And delete the movie folder on cloud storage if it exists
+${rclonebin} rmdir "${primaryremote}:${cloudpath}"
+
 #create new paths for new series both series and season.
 echo  "$(date "+%d.%m.%Y %T") INFO: Creating Movie Folder"
 mkdir -p "${mediapath}${moviefolder}"
-
-#if there are files larger than 50M in the media folder, delete them
-#this is a hack to handle Upgrades
-find ${mediapath}${moviefolder} -type f -size +50M -delete
-
-#And delete the Movie folder on cloud storage if it exists
-${rclonebin} --min-size 50M delete ${primaryremote}:${cloudpath}
 
 #Move the imported media file to actual storage and leave a cache file in its place
 echo "$(date "+%d.%m.%Y %T") INFO: Moving media to local media folder"
