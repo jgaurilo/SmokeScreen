@@ -59,6 +59,12 @@ echo "$(date "+%d.%m.%Y %T") INFO: Plex Scan Complete"
 echo ""
 
 if [ "${sonarrenabled}" = "1" ] || [ "${radarrenabled}" = "1" ]; then
+	
+	if [ $force = 1 ]; then
+		rm -rf "${localcache}"
+	fi
+	
+	mkdir -p "${localcache}"
 	echo "$(date "+%d.%m.%Y %T") INFO: Starting Cache Sync..."
 	echo "$(date "+%d.%m.%Y %T") INFO: Deleting cache files for non-existent media files"
 	find "${localcache}" -type f |
