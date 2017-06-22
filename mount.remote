@@ -11,7 +11,7 @@ echo "$(date "+%d.%m.%Y %T") INFO: Mounting filesystems"
 
 # Make sure all folders exist
 echo "$(date "+%d.%m.%Y %T") INFO: Creating mountpoints"
-mkdir -p "${googledir}"
+mkdir -p "${clouddir}"
 mkdir -p "${mediadir}"
 
 #Cloud data
