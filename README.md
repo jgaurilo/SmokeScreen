@@ -16,12 +16,12 @@ clone the repo then
 * move the scripts to ~/bin/
 * make sure all the scripts are executable
 
-# Required rclone Remote
+# Required rclone Remotes
     
-## Without encryption: ##
+## Without Encryption: ##
 Create a remote in rclone that points at the TOP LEVEL of your cloud storage provider. Set the configuration option `$primaryremote` to the remote you created in rclone, and set the configuration option `$cloudsubdir` to a descriptive name. This folder will be created at the top level of your cloud storage automatically when `update.cloud` is run the first time, and media will appear in subfolders beneath it.
 
-## With encryption ##
+## With Encryption ##
 Create a remote following the `without encryption` instructions first. Then create a second remote that is a `crypt` remote who's `remote` is the name of your unencrypted remote, followed by `:encrypted`. Follow the instructions to complete setting up the encrypted remote (entering passwords, etc). It is recommended to choose to encrypt filenames. Set the configuration option `$primaryremote` to the encrypted remote you created in rclone, and set the the configuration option `$cloudsubdir` to a descriptive name.
 
 The first time `update.cloud` is run, a folder named `encrypted` will be created at the top level of your cloud storage, and a sub-folder with the encrypted value of `$cloudsubdir` will be created and media will appear in subfolders beneath it.
@@ -107,3 +107,48 @@ Make SURE to wrap the command line with quotation marks, so that the entire thin
     ./pms "--list"
     
 The SmokeScreen.conf file must be in place (and properly configured for your environment) before it will work.
+
+# Switching to plexdrive
+plexdrive can be used for mounting instead of rclone. rclone is still used to upload new media (and encrypt if you so choose) so configure SmokeScreen to use rclone following the instructions for with or without encryption first, then continue here if you'd like to switch to plexdrive. Download plexdrive and place the binary somewhere (I recommend `/usr/bin/plexdrive`). Configure it to connect to your Google Drive, and then continue below.
+
+## Without Encryption ##
+In `smokescreen.conf` add the path to the plexdrive binary at the end of the file:
+
+    plexdrivebin=/usr/bin/plexdrive
+
+In `mount.remote` find:
+
+    ${rclonebin} mount ${rclonemountopts} ${primaryremote}: "${clouddir}" &
+    
+and replace it with:
+
+    screen -dmS plexdrive ${plexdrivebin} --clear-chunk-max-size=25G -v 3 "${clouddir}"
+
+## With Encryption ##
+In `smokescreen.conf` add the path to the plexdrive binary at the end of the file, and new variables for where plexdrive will mount your media and the name of the rclone remote you'll need to create:
+
+    plexdrivebin=/usr/bin/plexdrive
+    plexdrivemount=${HOME}/plexdrive
+    plexdriverclone=reverseencryption:
+    
+Create a new remote in rclone of type `crypt` and give it the name of the value for `$plexdriverclone` set above. Tell it the location is the value of `$plexdrivemount` followed by `/encrypted`. Finish creating the remote using the same encryption settings as the rclone remote created using the 'with encryption' steps for originally configuring SmokeScreen. Once complete, continue with the next steps below.
+    
+In `mount.remote` find:
+
+    ${rclonebin} mount ${rclonemountopts} ${primaryremote}: "${clouddir}" &
+    if [ ! "${cloudsubdir}" = "" ]; then
+	    while [ ! -d "${clouddir}/${cloudsubdir}" ]; do
+	    	sleep 10
+	    done
+    fi
+    
+And replace it with:
+
+    screen -dmS plexdrive ${plexdrivebin} --clear-chunk-max-size=25G -v 3 "${plexdrivemount}"
+	while [ ! -d "${plexdrivemount}/encrypted" ]; do
+		sleep 10
+    done
+    ${rclonebin} mount ${rclonemountopts} ${reverseencryption}: "${clouddir}" &
+    
+## Sonarr/Radarr And Plex Settings ##
+using plexdrive negates the need for caching. Disable the cache by setting both `$sonarrenabled` and `$radarrenabled` in `smokescreen.conf` to 0. Then, reconfigure Sonarr and Radarr to use `$clouddir` as their root instead of `$localcache` and disable the custom post processing scripts `sonarr.cache` and `radarr.cache` as they will no longer work. Add a connection to your Plex server in Sonarr and Radarr to update your library when new content is downloaded. Automatic scanning in Plex can also be re-enabled.
