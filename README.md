@@ -150,5 +150,12 @@ And replace it with:
     done
     ${rclonebin} mount ${rclonemountopts} ${reverseencryption}: "${clouddir}" &
     
+In `unmount.remote` add a section to also unmount the plexdrive mount:
+
+    if mountpoint -q $plexdrivemount; then
+        echo "$(date "+%d.%m.%Y %T") INFO: Unmounting ${plexdrivemount}"
+        fusermount -uz $plexdrivemount 2>&1
+    fi
+
 ## Sonarr/Radarr And Plex Settings ##
 using plexdrive negates the need for caching. Disable the cache by setting both `$sonarrenabled` and `$radarrenabled` in `smokescreen.conf` to 0. Then, reconfigure Sonarr and Radarr to use `$clouddir` as their root instead of `$localcache` and disable the custom post processing scripts `sonarr.cache` and `radarr.cache` as they will no longer work. Add a connection to your Plex server in Sonarr and Radarr to update your library when new content is downloaded. Automatic scanning in Plex can also be re-enabled.
