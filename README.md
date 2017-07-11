@@ -122,7 +122,7 @@ In `mount.remote` find:
     
 and replace it with:
 
-    screen -dmS plexdrive ${plexdrivebin} --clear-chunk-max-size=25G -v 3 "${clouddir}"
+    screen -dmS plexdrive ${plexdrivebin} -v 3 "${clouddir}"
 
 ## With Encryption ##
 In `smokescreen.conf` add the path to the plexdrive binary at the end of the file, and new variables for where plexdrive will mount your media and the name of the rclone remote you'll need to create:
