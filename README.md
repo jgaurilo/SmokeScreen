@@ -158,4 +158,6 @@ In `unmount.remote` add a section to also unmount the plexdrive mount:
     fi
 
 ## Sonarr/Radarr And Plex Settings ##
-using plexdrive negates the need for caching. Disable the cache by setting both `$sonarrenabled` and `$radarrenabled` in `smokescreen.conf` to 0. Then, reconfigure Sonarr and Radarr to use `$mediadir` as their root instead of `$localcache` and disable the custom post processing scripts `sonarr.cache` and `radarr.cache` as they will no longer work. Add a connection to your Plex server in Sonarr and Radarr to update your library when new content is downloaded. Automatic scanning in Plex can also be re-enabled.
+using plexdrive negates the need for caching. Disable the cache by setting both `$sonarrenabled` and `$radarrenabled` in `smokescreen.conf` to 0. Then, reconfigure Sonarr and Radarr to use `$mediadir` as their root instead of `$localcache` and disable the custom post processing scripts `sonarr.cache` and `radarr.cache` as they will no longer work. You can use the included `media.upgrade` script to remove upgraded media from cloud storage (and the .unionfs metadata files) for when Sonarr and Radarr download new versions of media files you already have. This script works in both Radarr and Sonarr, and will automatically update Plex.
+
+If you don't want to use the included upgrade script, add a connection to your Plex server in Sonarr and Radarr to update your library when new content is downloaded if you so desire. Automatic scanning in Plex can also be re-enabled.
