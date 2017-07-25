@@ -1,9 +1,9 @@
 # SmokeScreen
-Host your Plex media with (or without) rclone-crypt on cloud storage, and a local cache for Sonarr and Radarr to scan to prevent Google Drive API limit bans. Special thanks to Reddit users /u/gesis and /u/ryanm91 for most of the heavy lifting.
+Host your Plex media with (or without) rclone-crypt on cloud storage. Special thanks to Reddit users /u/gesis and /u/ryanm91 for most of the heavy lifting.
 
 # Pre-requisites
 This project relies on:
-* rclone
+* rclone 1.37+ (require the tpslimit option)
 * unionfs-fuse
 * bc (sudo apt-get install bc)
 * Plex Media Server
@@ -39,30 +39,21 @@ There is a checking script included that looks for a specific file on cloud stor
 Now mount the system by running the `check.mount` script. You should see your cloud storage mounted at `$clouddir` and you should see a union of your local media and cloud storage media directory at `$mediadir`. If you don't, stop here and resolve it before continuing.
 
 # Plex Media Server Configuration
-When using SmokeScreen, PMS must be configured to no longer scan for media, and disable media analysis. If you leave these options enabled, you will likely end up with a 24H ban for hitting Google's API too much. Since rclone provides no caching of data from your cloud service, each request hits the API.
+The newest (1.37 at time of this writing) version of rclone now includes options to limit API usage. This means we can enable Plex scanning without worrying about API bans.
 
 Media libraries in Plex must be configured:
 * Plex should look at `$plex_shows_folder` for TV Series
 * Plex should look at `$plex_movie_folder` for Movies
 * Plex should look at `$plex_music_folder` for Music
 
-You must disable:
-* Settings -> Library -> Update my library automatically
-* Settings -> Library -> Run a partial scan when changes are detected
-* Settings -> Library -> Include music libraries in automatic updates
-* Settings -> Library -> Update my library periodically
-* Settings -> Scheduled Tasks -> Update all libraries during maintenance
-* Settings -> Scheduled Tasks -> Upgrade media analysis during maintenance
-* Settings -> Scheduled Tasks -> Perform extensive media analysis during maintenance
-
-It is also recommended to disable:
+It is recommended to disable:
 * Settings -> Library -> Empty trash automatically after every scan
 * Settings -> Library -> Allow media deletion
 
-If you've created new libraries or modified the paths in existing libraries in Plex, cancel the scans that Plex initiates automatically, as they may cause excessive API usage. We will rescan everything once we're done configuring the other software.
+If you've created new libraries or modified the paths in existing libraries in Plex, cancel the scans that Plex initiates automatically. We will rescan everything once we're done configuring the other software.
 
 # Sonarr and Radarr Configuration
-To use Sonarr/Radarr without the local cache, set the two variables in the configuration `$sonarrenabled` and `$radarrenabled` = 0. Sonarr and Radarr should be configured to use `$mediadir/$media_shows` and `$mediadir/$media_movie` as the root folders for all series/movies. Be warned that excessive scanning by Sonarr/Radarr can lead to 24H bans by Google.
+Sonarr and Radarr should be configured to use `$mediadir/$media_shows` and `$mediadir/$media_movie` as the root folders for all series/movies.
 
 Media that these tools download will follow the following path with the cache disabled:
 
@@ -70,22 +61,13 @@ Media that these tools download will follow the following path with the cache di
 * Sonarr/Radarr "import" the file to $mediadir
 * update.cloud will then upload it to cloud storage
 
-To use the local cache, set the two variables in the configuration `$sonarrenabled` and `$radarrenabled` = 1. Reconfigure Sonarr and Radarr to look at `$localcache/$media_shows` and `$localcache/$media_movie` as their root folder. On the 'Connect' tab of the settings pages, add a custom script that points at `sonarr.cache` in Sonarr and `radarr.cache` in Radarr that notifies on `Download` and `Upgrade`.
-
-Media that these tools download will follow the following path with the cache enabled:
-
-* Download client downloads to temp directory
-* Sonarr/Radarr "import" the file to $localcache
-* The custom script in Sonarr/Radarr will move the file to the $localmedia folder and scan the media in to Plex
-* update.cloud will then upload it to cloud storage
-
-If you are NOT using Sonarr or Radarr, set the configuration values for them to 0. Manually add Movies and TV series to `$localmedia/$media_shows` for TV and `$localmedia/$media_movie` for movies. Be sure that media manually placed here follows Plex's media naming expectations.
+If you are NOT using Sonarr or Radarr, manually add Movies and TV series to `$localmedia/$media_shows` for TV and `$localmedia/$media_movie` for movies. Be sure that media manually placed here follows Plex's media naming expectations.
 
 # Initial scan and cache build
-Once all the software is configured correctly, run `scan.media 1` to force a complete scan of all media and build the cache for Sonarr and Radarr if it's enabled. Be prepared to wait, as this will take a while. It might be a good idea to run the scan in a screen so that if your connection is interrupted the scan won't stop: `screen /bin/bash ~/bin/scan.media 1`.
+Once all the software is configured correctly, run `scan.media 1` to force a complete scan of all media. Be prepared to wait, as this will take a while. It might be a good idea to run the scan in a screen so that if your connection is interrupted the scan won't stop: `screen /bin/bash ~/bin/scan.media 1`.
 
 # Automatic Processing
-CRON is used to automatically mount the drives, upload content to cloud storage, scan new media in to Plex, keep the cache up to date and remove local copies of media.
+CRON is used to automatically mount the drives, upload content to cloud storage, scan new media in to Plex, and remove local copies of media.
 
 Add the following to your user's crontab:
 
@@ -107,57 +89,3 @@ Make SURE to wrap the command line with quotation marks, so that the entire thin
     ./pms "--list"
     
 The SmokeScreen.conf file must be in place (and properly configured for your environment) before it will work.
-
-# Switching to plexdrive
-plexdrive can be used for mounting instead of rclone. rclone is still used to upload new media (and encrypt if you so choose) so configure SmokeScreen to use rclone following the instructions for with or without encryption first, then continue here if you'd like to switch to plexdrive. Download plexdrive and place the binary somewhere (I recommend `/usr/bin/plexdrive`). Configure it to connect to your Google Drive, and then continue below.
-
-## Without Encryption ##
-In `smokescreen.conf` add the path to the plexdrive binary at the end of the file:
-
-    plexdrivebin=/usr/bin/plexdrive
-
-In `mount.remote` find:
-
-    ${rclonebin} mount ${rclonemountopts} ${primaryremote}: "${clouddir}" &
-    
-and replace it with:
-
-    screen -dmS plexdrive ${plexdrivebin} -v 3 "${clouddir}"
-
-## With Encryption ##
-In `smokescreen.conf` add the path to the plexdrive binary at the end of the file, and new variables for where plexdrive will mount your media and the name of the rclone remote you'll need to create:
-
-    plexdrivebin=/usr/bin/plexdrive
-    plexdrivemount=${HOME}/plexdrive
-    plexdriverclone=reverseencryption:
-    
-Create a new remote in rclone of type `crypt` and give it the name of the value for `$plexdriverclone` set above. Tell it the location is the value of `$plexdrivemount` followed by `/encrypted`. Finish creating the remote using the same encryption settings as the rclone remote created using the 'with encryption' steps for originally configuring SmokeScreen. Once complete, continue with the next steps below.
-    
-In `mount.remote` find:
-
-    ${rclonebin} mount ${rclonemountopts} ${primaryremote}: "${clouddir}" &
-    if [ ! "${cloudsubdir}" = "" ]; then
-	    while [ ! -d "${clouddir}/${cloudsubdir}" ]; do
-	    	sleep 10
-	    done
-    fi
-    
-And replace it with:
-
-    screen -dmS plexdrive ${plexdrivebin} --clear-chunk-max-size=25G -v 3 "${plexdrivemount}"
-	while [ ! -d "${plexdrivemount}/encrypted" ]; do
-		sleep 10
-    done
-    ${rclonebin} mount ${rclonemountopts} ${reverseencryption}: "${clouddir}" &
-    
-In `unmount.remote` add a section to also unmount the plexdrive mount:
-
-    if mountpoint -q $plexdrivemount; then
-        echo "$(date "+%d.%m.%Y %T") INFO: Unmounting ${plexdrivemount}"
-        fusermount -uz $plexdrivemount 2>&1
-    fi
-
-## Sonarr/Radarr And Plex Settings ##
-using plexdrive negates the need for caching. Disable the cache by setting both `$sonarrenabled` and `$radarrenabled` in `smokescreen.conf` to 0. Then, reconfigure Sonarr and Radarr to use `$mediadir` as their root instead of `$localcache` and disable the custom post processing scripts `sonarr.cache` and `radarr.cache` as they will no longer work. You can use the included `media.upgrade` script to remove upgraded media from cloud storage (and the .unionfs metadata files) for when Sonarr and Radarr download new versions of media files you already have. This script works in both Radarr and Sonarr, and will automatically update Plex.
-
-If you don't want to use the included upgrade script, add a connection to your Plex server in Sonarr and Radarr to update your library when new content is downloaded if you so desire. Automatic scanning in Plex can also be re-enabled.
