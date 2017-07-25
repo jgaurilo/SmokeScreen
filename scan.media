@@ -25,27 +25,21 @@ find_options="-mmin -$(echo "${cur_exec_date}" - "${prev_exec_date}" | bc)"
 echo "$cur_exec_date" > "${cache_dir}/lastrun"
 
 # Force a full refresh if any parameter comes in
-force=0
 if [ ! "${1}" = "" ]; then
 	find_options=""
-	force=1
 fi
 
 # scan movies in to Plex
-if [ $force = 1 ] || [ ! $radarrenabled = 1 ]; then
-	find ${plex_movie_folder} -mindepth 1 -type d ${find_options} |
-	while read -r d; do
-		${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_movie_category} -d "${d}"
-	done
-fi
+find ${plex_movie_folder} -mindepth 1 -type d ${find_options} |
+while read -r d; do
+	${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_movie_category} -d "${d}"
+done
 
 # scan TV in to Plex
-if [ $force = 1 ] || [ ! $sonarrenabled = 1 ]; then
-	find ${plex_shows_folder} -mindepth 2 -type d ${find_options} |
-	while read -r d; do
-		${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_shows_category} -d "${d}"
-	done
-fi
+find ${plex_shows_folder} -mindepth 2 -type d ${find_options} |
+while read -r d; do
+	${PLEX_MEDIA_SERVER_HOME}/Plex\ Media\ Scanner -s -r -c ${plex_shows_category} -d "${d}"
+done
 
 # scan music in to Plex
 if [ ! "${plex_music_folder}" = "" ]; then
@@ -57,58 +51,3 @@ fi
 
 echo "$(date "+%d.%m.%Y %T") INFO: Plex Scan Complete"
 echo ""
-
-if [ "${sonarrenabled}" = "1" ] || [ "${radarrenabled}" = "1" ]; then
-	
-	if [ $force = 1 ]; then
-		rm -rf "${localcache}"
-	fi
-	
-	mkdir -p "${localcache}"
-	echo "$(date "+%d.%m.%Y %T") INFO: Starting Cache Sync..."
-	echo "$(date "+%d.%m.%Y %T") INFO: Deleting cache files for non-existent media files"
-	find "${localcache}" -type f |
-	while read n; do
-	        # Figure out the path to the actual media file
-	        mediafile="${mediadir}${n#${localcache}}"
-	        if [ ! -f "${mediafile}" ]; then
-	                echo "$(date "+%d.%m.%Y %T") INFO: No media file exists for ${n}, removing from cache"
-	                rm "${n}"
-	        fi
-	done
-
-	if [ "${radarrenabled}" = "1" ]; then
-		echo "$(date "+%d.%m.%Y %T") INFO: Creating missing cache files for Movies"
-		find "${plex_movie_folder}" -type f -size +25M |
-		while read n; do
-			# Figure out the path to the cache version of this file
-			cachefile="${localcache}${n#${mediadir}}"
-			cachedir="$(dirname -- "${cachefile}")"
-			if [ ! -f "${cachefile}" ]; then
-			        echo "$(date "+%d.%m.%Y %T") INFO: Creating cache file: ${cachefile}"
-			        mkdir -p "${cachedir}"
-			        touch "${cachefile}"
-			fi
-		done
-	fi
-
-	if [ "${sonarrenabled}" = "1" ]; then
-		echo "$(date "+%d.%m.%Y %T") INFO: Creating missing cache files for TV shows"
-		find "${plex_shows_folder}" -type f -size +25M |
-		while read n; do
-			# Figure out the path to the cache version of this file
-			cachefile="${localcache}${n#${mediadir}}"
-			cachedir="$(dirname -- "${cachefile}")"
-			if [ ! -f "${cachefile}" ]; then
-			        echo "$(date "+%d.%m.%Y %T") INFO: Creating cache file: ${cachefile}"
-			        mkdir -p "${cachedir}"
-			        touch "${cachefile}"
-			fi
-		done
-	fi
-
-	echo "$(date "+%d.%m.%Y %T") INFO: Completed Cache Sync..."
-else
-	# cache disabled, delete the cache folder
-	rm -rf "${localcache}"
-fi
