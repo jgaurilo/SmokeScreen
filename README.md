@@ -63,7 +63,7 @@ Media that these tools download will follow the following path with the cache di
 
 If you are NOT using Sonarr or Radarr, manually add Movies and TV series to `$localmedia/$media_shows` for TV and `$localmedia/$media_movie` for movies. Be sure that media manually placed here follows Plex's media naming expectations.
 
-# Initial scan and cache build
+# Initial scan
 Once all the software is configured correctly, run `scan.media 1` to force a complete scan of all media. Be prepared to wait, as this will take a while. It might be a good idea to run the scan in a screen so that if your connection is interrupted the scan won't stop: `screen /bin/bash ~/bin/scan.media 1`.
 
 # Automatic Processing
@@ -72,12 +72,12 @@ CRON is used to automatically mount the drives, upload content to cloud storage,
 Add the following to your user's crontab:
 
     @hourly /home/USER/bin/update.cloud >> /home/USER/logs/update.cloud.log 2>&1
-    0 1 * * * /home/USER/bin/scan.media >> /home/USER/logs/scan.media.log 2>&1
-    @hourly /home/USER/bin/nuke.local >> /home/USER/logs/nuke.local.log 2>&1
-    */2 * * * * /home/USER/bin/check.mount >> /home/USER/logs/check.mount.log 2>&1
+    0    1  * * * /home/USER/bin/scan.media >> /home/USER/logs/scan.media.log 2>&1
+    0    23 * * * /home/USER/bin/nuke.local >> /home/USER/logs/nuke.local.log 2>&1
+    */5  *  * * * /home/USER/bin/check.mount >> /home/USER/logs/check.mount.log 2>&1
 
 # A Note About Music
-Since cloud storage-hosted music doesn't work well with Plex, but we've disabled all automatic scanning, newly added music will no longer appear automatically in Plex. The configuration variables `$plex_music_folder` and `$plex_music_category` are available so that `scan.media` will scan newly added music. Leave these variables blank if you do not use Plex for music.
+Since cloud storage-hosted music doesn't work well with Plex, but we may have disabled automatic scanning, newly added music might not appear automatically in Plex. The configuration variables `$plex_music_folder` and `$plex_music_category` are available so that `scan.media` will scan newly added music. Leave these variables blank if you do not use Plex for music, or if you have Plex set to automatically scan your music folder.
 
 # Utility Script
 There is a script included called pms. This script just sets up the environment so that you can call the Plex media scanner easily. Usage is:
