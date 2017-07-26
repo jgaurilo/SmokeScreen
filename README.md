@@ -90,7 +90,7 @@ Add the following to your user's crontab:
     0    23 * * * /home/USER/bin/nuke.local   >> /home/USER/logs/nuke.local.log 2>&1
     */5  *  * * * /home/USER/bin/check.mount  >> /home/USER/logs/check.mount.log 2>&1
 
-If you prefer to allow Plex to handle all media scanning, do not add the line for `scan/media` to your CRON. 
+If you prefer to allow Plex to handle all media scanning, do not add the line for `scan.media` to your CRON. 
 
 # A Note About Music
 Since cloud storage-hosted music doesn't work well with Plex, but we may have disabled automatic scanning, newly added music might not appear automatically in Plex. The configuration variables `$plex_music_folder` and `$plex_music_category` are available so that `scan.media` will scan newly added music. Leave these variables blank if you do not use Plex for music, or if you have Plex set to automatically scan your music folder. Note, the `scan.media` script seems more reliable on larger music libraries, and using it is recommended over Plex's internal scanning regardless.
