@@ -3,6 +3,12 @@
 # existing files from cloud storage when Radarr/Sonarr perform an "upgrade"
 # of a media file, or you import a new version of a file that already exists
 # Requires that Sonarr/Radarr and Plex share the same "root" folder for media
+# 
+# This is required because the cloud storage is mounted read only, so when
+# a file is deleted from the union mount, instead of actually deleting it
+# unionfs-fuse creates a metadata file that will hide the file in question.
+# This script deletes that metadata file and then deletes the actual file
+# from your cloud storage.
 ###############################################################################
 . "${HOME}/.config/SmokeScreen/smokescreen.conf"
 
