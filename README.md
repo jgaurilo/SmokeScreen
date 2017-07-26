@@ -95,6 +95,8 @@ If you prefer to allow Plex to handle all media scanning, do not add the line fo
 # A Note About Music
 Since cloud storage-hosted music doesn't work well with Plex, but we may have disabled automatic scanning, newly added music might not appear automatically in Plex. The configuration variables `$plex_music_folder` and `$plex_music_category` are available so that `scan.media` will scan newly added music. Leave these variables blank if you do not use Plex for music, or if you have Plex set to automatically scan your music folder. Note, the `scan.media` script seems more reliable on larger music libraries, and using it is recommended over Plex's internal scanning regardless.
 
+DO NOT store your music at `$localmedia` as it will get uploaded to cloud storage and deleted locally. Also, do not store your music in any of the other folders configured for FUSE mounts (`$clouddir`, `$mediadir`, etc). Use a local folder instead.
+
 # Plex Media Scanner Utility Script
 There is a script included called `pms`. This script just sets up the environment so that you can call the Plex media scanner easily. Usage is:
 
