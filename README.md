@@ -1,5 +1,8 @@
 # SmokeScreen
-Host your Plex media with (or without) rclone-crypt on cloud storage. Special thanks to Reddit users /u/gesis and /u/ryanm91 for most of the heavy lifting.
+Host your Plex media with (or without) rclone-crypt on cloud storage with automated uploading and local cleanup of new media.
+
+# Thank You
+Reddit users /u/gesis and /u/ryanm91
 
 # Pre-requisites
 This project relies on:
