@@ -6,10 +6,10 @@ Reddit users /u/gesis and /u/ryanm91
 
 # Pre-requisites
 This project relies on:
-* rclone 1.37+ (require the tpslimit option)
-* unionfs-fuse
-* bc (sudo apt-get install bc)
-* Plex Media Server
+* [rclone](https://rclone.org/downloads/) 1.37+
+* unionfs-fuse `sudo apt-get install unionfs-fuse`
+* bc `sudo apt-get install bc`
+* [Plex Media Server](https://plex.tv)
 * Plex running as the same user as the scripts (VERY IMPORTANT)
 * Sonarr, Radarr, SABnzbd, Torrent Clients (optional)
 
