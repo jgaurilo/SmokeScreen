@@ -35,7 +35,7 @@ if [ ! "${sonarr_eventtype}" = "" ]; then
 		if [ ! "${deletedfile}" = "" ]; then
 			cloudfile="${cloudpath}/${deletedfile}"
 			deletedfile="${mediadir}/${deletedfile}"
-			unionfshiddenfile="${deletedfile#$mediadir#$unionhidden}"
+			unionfshiddenfile="${deletedfile#$mediadir#$unionhidden}_HIDDEN~"
 	
 			echo "$(date "+%d.%m.%Y %T") INFO: Deleting ${cloudfile} From Cloud Storage"
 			${rclonebin} -v delete "${primaryremote}:${cloudfile}"
